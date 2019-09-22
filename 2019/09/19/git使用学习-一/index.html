@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.1.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.1.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.1.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.1.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Git作为目前世界上最先进的分布式版本控制系统（没有之一），不但能自动记录每次文件的改动，还可以让同事协作编辑，这样就不用自己管理一堆类似的文件了，也不需要把文件传来传去。可以方便我们对代码进行修改，维护，保存。在个人以及团队的代码管理中都特别受欢迎，掌握Git工具的使用是非常有必要的一件事。无论是对我们的学习还是以后的工作。 本文主要参考了https://www.liaoxuefeng.com/">
+<meta name="keywords" content="实用工具">
+<meta property="og:type" content="article">
+<meta property="og:title" content="git使用学习（一）">
+<meta property="og:url" content="http://yoursite.com/2019/09/19/git使用学习-一/index.html">
+<meta property="og:site_name" content="夜岚苍苍的博客">
+<meta property="og:description" content="Git作为目前世界上最先进的分布式版本控制系统（没有之一），不但能自动记录每次文件的改动，还可以让同事协作编辑，这样就不用自己管理一堆类似的文件了，也不需要把文件传来传去。可以方便我们对代码进行修改，维护，保存。在个人以及团队的代码管理中都特别受欢迎，掌握Git工具的使用是非常有必要的一件事。无论是对我们的学习还是以后的工作。 本文主要参考了https://www.liaoxuefeng.com/">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-09-22T04:34:28.546Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="git使用学习（一）">
+<meta name="twitter:description" content="Git作为目前世界上最先进的分布式版本控制系统（没有之一），不但能自动记录每次文件的改动，还可以让同事协作编辑，这样就不用自己管理一堆类似的文件了，也不需要把文件传来传去。可以方便我们对代码进行修改，维护，保存。在个人以及团队的代码管理中都特别受欢迎，掌握Git工具的使用是非常有必要的一件事。无论是对我们的学习还是以后的工作。 本文主要参考了https://www.liaoxuefeng.com/">
+
+
+
+
+
+  
+  
+  <link rel="canonical" href="http://yoursite.com/2019/09/19/git使用学习-一/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>git使用学习（一） | 夜岚苍苍的博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">夜岚苍苍的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">学习历程</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/09/19/git使用学习-一/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="周燚乾">
+      <meta itemprop="description" content="一个想成为大佬的萌新">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="夜岚苍苍的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">git使用学习（一）
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-09-19 19:37:55" itemprop="dateCreated datePublished" datetime="2019-09-19T19:37:55+08:00">2019-09-19</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-09-22 12:34:28" itemprop="dateModified" datetime="2019-09-22T12:34:28+08:00">2019-09-22</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Git/" itemprop="url" rel="index"><span itemprop="name">Git</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Git作为目前世界上最先进的分布式版本控制系统（没有之一），不但能自动记录每次文件的改动，还可以让同事协作编辑，这样就不用自己管理一堆类似的文件了，也不需要把文件传来传去。可以方便我们对代码进行修改，维护，保存。在个人以及团队的代码管理中都特别受欢迎，掌握Git工具的使用是非常有必要的一件事。无论是对我们的学习还是以后的工作。</p>
+<p>本文主要参考了<a href="https://www.liaoxuefeng.com/wiki/896043488029600/896067074338496的教程，简化提取了一些基本的要点。" target="_blank" rel="noopener">https://www.liaoxuefeng.com/wiki/896043488029600/896067074338496的教程，简化提取了一些基本的要点。</a></p>
+<h1 id="创建版本库"><a href="#创建版本库" class="headerlink" title="创建版本库"></a>创建版本库</h1><p><strong>git init</strong></p>
+<p><code>git init</code></p>
+<p>将当前目录初始化为git仓库，生成.git目录，（如果看不到此目录说明此目录是隐藏目录），负责跟踪管理版本，所有有关此项目的快照数据都存放在此处。不要轻易修改，否则可能会破坏git仓库。</p>
+<p>使用我们指定目录作为Git仓库。</p>
+<p><code>git init dir_name</code></p>
+<h1 id="将文件添加到版本库"><a href="#将文件添加到版本库" class="headerlink" title="将文件添加到版本库"></a>将文件添加到版本库</h1><p>这里需要说明以下，创建版本库后的生成.git目录是版本库(Repository),其中有缓存区和初始化时自动创建的第一个分支master。</p>
+<p>而使用git将文件提交到版本库需要两个步骤：</p>
+<p>第一步：将文件添加到缓存区，使用命令git add</p>
+<p>第二步：将缓存区的所有文件全部提交到当前分支上，使用命令git commit</p>
+<p><strong>git add</strong></p>
+<p>将文件添加到缓存。<br><code>git add filename</code></p>
+<p>要使用git命令对文件进行操作，就需要将此文件添加到缓存区。</p>
+<p>filename为要添加的文件名。</p>
+<p>也可使用参数.添加当前目录下的全部文件：</p>
+<p><code>git add .</code></p>
+<p>也可将指定后缀名的文件添加进入缓存区</p>
+<p><code>git add *+后缀名</code></p>
+<p><strong>git commit</strong></p>
+<p>上文已经提到过，此命令是将缓存区的全部文件提交到当前分支下。</p>
+<p>git需要记录每一次提交的名字和邮箱地址，如果是第一次使用需要配置用户名和邮箱地址，可按照提示输入。</p>
+<p><code>git commit -m &quot;注释&quot;</code><br>可在引号内提供提交注释</p>
+<p>每一次修改文件后，若想要提交修改，就要先将文件添加到缓存区，再提交到版本库。</p>
+<h1 id="显示工作区的状态和修改内容"><a href="#显示工作区的状态和修改内容" class="headerlink" title="显示工作区的状态和修改内容"></a>显示工作区的状态和修改内容</h1><p><strong>git status</strong></p>
+<p>显示你上次提交更新后的更改或者写入缓存的改动</p>
+<p><code>git status -s</code></p>
+<p>其中-s为参数，是使获得的结构简短输出，如果不加该参数会详细输出内容。</p>
+<p><strong>git diff</strong></p>
+<p>查看执行git status 的详细信息，git status显示上次进行的改动，git diff将这些改动的具体内容一行一行的显示出来。</p>
+<p><code>git diff filename</code>显示对filename文件的修改</p>
+<p><code>git diff HEAD --filename</code>查看工作区和版本库中的filename文件的区别。</p>
+<p>git diff 命令显示已写入缓存与已修改但尚未写入缓存的改动的区别。</p>
+<ul>
+<li>查看尚未缓存的改动：git diff</li>
+<li>查看已缓存的改动：git diff –cached</li>
+<li>查看已缓存与为缓存的所有改动:git diff HEAD</li>
+<li>显示摘要而非整个diff：git diff –stat</li>
+</ul>
+<p><strong>git log</strong></p>
+<p><code>git log</code>显示从最近三次的提交日志。</p>
+<p>如果觉得输出信息太多，可以加上参数–pretty=online显示简略信息</p>
+<p><code>git log --pretty=oneline</code></p>
+<h1 id="版本回退"><a href="#版本回退" class="headerlink" title="版本回退"></a>版本回退</h1><p><strong>git reset HEAD</strong></p>
+<p>取消已缓存的内容，仅取消当次暂存区的修改</p>
+<p>HEAD是指向当前版本的指针。git回退版本就是将HEAD指针移到回退的版本。</p>
+<p><code>git reset HEAD filename</code>可指定要取消缓存区修改的文件</p>
+<p><code>git reset --hard HEAD^</code>将当前版本回退到上一个版本，如果要回退到上两个版本则加两个^^,如果要回退的版本太多，如回退100个版本就写成<code>HEAD~100</code>。</p>
+<p>但是如果回退之后感觉后悔了，向找回最新的版本怎么办呢？</p>
+<p>git为我们的每一次提交都生成了版本号(commit id)，通过使用版本号我们就可以重新返回到原来的版本。使用命令：</p>
+<p><code>git reset --hard commit_id</code>，其中commit_id为版本号，没必要写全，但也不能只写前一两位，不然git可能会找到多个版本号，不能确定了。</p>
+<p>命令<code>git reflog</code>记录了每一次命令，通过这个命令可以帮助我们找到版本号。</p>
+<h1 id="撤销修改"><a href="#撤销修改" class="headerlink" title="撤销修改"></a>撤销修改</h1><p><code>git checkout -- filename</code>将filename文件在工作区的修改全部撤销，这里的文件filename至少已经向版本库提交过一次。</p>
+<p>这里有两种情况：</p>
+<p>一种是文件自修改后还没有被放到暂存区，现在，撤销修改就回到和版本库一模一样的状态；</p>
+<p>一种是文件已经添加到暂存区后，又作了修改，现在，撤销修改就回到添加到暂存区后的状态。</p>
+<p>总之，就是让这个文件回到最近一次<code>git commit</code>或<code>git add</code>时的状态。</p>
+<p>但是如果你修改了文件，又将它<code>git add</code>进了暂存区,那么在提交之前，你可以使用下面的命令将暂存区的修改回退到工作区</p>
+<p><code>git reset HEAD -- filename</code></p>
+<p>然后在使用<code>git cheackout -- filename</code>将工作区的修改撤销</p>
+<p>总之</p>
+<ul>
+<li>当你在工作区修改了某个文件的内容，向丢弃工作区的修改时，使用命令<code>git checkout -- filename</code></li>
+<li>当你在工作区修改了某个文件的内容，并且又将其添加到暂存区后，若想撤销修改分为两步，第一步，使用命令<code>git reset HEAD filename</code>返回上一个场景，再按照上一个场景的方法操作。</li>
+<li>如果提交了不合数的版本，可按照版本回退的操作撤销修改。</li>
+</ul>
+<h1 id="删除文件"><a href="#删除文件" class="headerlink" title="删除文件"></a>删除文件</h1><p><strong>git rm</strong></p>
+<p>如果只是简单地从工作目录中手工删除文件，运行 git status 时就会在 Changes not staged for commit 的提示。</p>
+<p>要从 Git 中移除某个文件，就必须要从已跟踪文件清单中移除，然后提交。可以用以下命令完成此项工作:</p>
+<p><code>git rm &lt;file&gt;</code></p>
+<p>如果删除之前修改过并且已经放到暂存区域的话，则必须要用强制删除选项 -f</p>
+<p><code>git rm -f &lt;file&gt;</code></p>
+<p>如果把文件从暂存区域移除，但仍然希望保留在当前工作目录中，换句话说，仅是从跟踪清单中删除，使用 –cached 选项即可</p>
+<p><code>git rm --cached &lt;file&gt;</code></p>
+<p>可以递归删除，即如果后面跟的是一个目录做为参数，则会递归删除整个目录中的所有子目录和文件：</p>
+<p><code>git rm -r *</code></p>
+<p>进入某个目录中，执行此语句，会删除该目录下的所有文件和子目录。</p>
+<p>使用命令<code>git rm</code>后在使用<code>git commit</code>提交一次，那么文件就从版本库中删除了。</p>
+<p>如果你手动删除了文件，但是还没有提交，此时你想恢复文件，使用命令<code>git checkou -- filename</code>可以把文件恢复到最新版本，因为<code>git checkout</code>其实是用版本库的文件替换工作区的文件。</p>
+<h1 id="添加远程仓库"><a href="#添加远程仓库" class="headerlink" title="添加远程仓库"></a>添加远程仓库</h1><p>github是为git提供仓库托管服务的网站，在github创建了一个仓库后，可以使之与本地仓库同步，这样，github上的仓库既可以作为备份，又可以让其他人通过该仓库来协作。</p>
+<p>由于本地仓库和github仓库的传输通过ssh加密，所以首先，需要在自己的github账户上添加SSH KEY密匙：</p>
+<ul>
+<li>创建SSH密匙，先查看用户主目录下有无.ssh目录（Windows下可在C:\Users\ad.ssh下找到，Linux下可直接cd ~/.ssh），如果有再看看有无id_rsa和id_rsa.pub这两个文件，如果有直接进入下一步，若没有则使用命令<code>$ ssh-keygen -t rsa -C &quot;youremail@example.com&quot;</code>输入自己的邮箱地址，一路回车即可。<br>如果一切顺利的话，可以在用户主目录里找到.ssh目录，里面有id_rsa和id_rsa.pub两个文件，这两个就是SSH Key的秘钥对，id_rsa是私钥，不能泄露出去，id_rsa.pub是公钥，可以放心地告诉任何人。</li>
+<li>登陆GitHub，打开“Account settings”，“SSH Keys”页面。然后，点“Add SSH Key”，填上任意Title，在Key文本框里粘贴id_rsa.pub文件的内容。如果添加多台电脑的SSH密匙就可以在多台电脑上向github上推送。</li>
+</ul>
+<p>接下来便可以添加远程仓库了。</p>
+<p>首先新建一个仓库，在本地git仓库下运行命令：</p>
+<p><code>git remote add origin git@github.com:username/reponame.git</code></p>
+<p>输入自己的github账户名和仓库名，就可以将本地仓库与之关联。</p>
+<p>添加后，远程库的名字就是origin，这是Git默认的叫法，也可以改成别的，但是origin这个名字一看就知道是远程库。</p>
+<p>下一步，将本地仓库的所有内容推送到远程库上：</p>
+<p><code>git push -u origin master</code></p>
+<p>把本地库的内容推送到远程，用git push命令，实际上是把当前分支master推送到远程。</p>
+<p>由于远程库是空的，我们第一次推送master分支时，加上了-u参数，Git不但会把本地的master分支内容推送的远程新的master分支，还会把本地的master分支和远程的master分支关联起来，在以后的推送或者拉取时就可以简化命令。</p>
+<p>刷新github仓库页面，就可以看到已经与本地仓库一样了。</p>
+<p>此后，只要在本地做了修改，便可以通过命令<code>git push origin master</code>将本地master分支的最新修改推送至github。</p>
+<h1 id="从远程库克隆"><a href="#从远程库克隆" class="headerlink" title="从远程库克隆"></a>从远程库克隆</h1><p><strong>git clone</strong></p>
+<p>拷贝一个git仓库到本地当前目录下，然后就可以在本地查看并修改项目。</p>
+<p><code>git clone url</code></p>
+<p>url为想要复制的项目。</p>
+<p>也可将项目拷贝到指定目录下：</p>
+<p><code>git clone repo directory</code></p>
+<p>repo为Git仓库，directory为本地目录</p>
+<p>如果有多个人协作开发，那么每个人各自从远程克隆一份就可以了。</p>
+<p>git clone 时，可以用不同的协议，包括 ssh, git, https 等，其中最常用的是 ssh，因为速度较快，还可以配置公钥免输入密码。各种写法如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git clone git@github.com:项目名.git         --SSH协议</span><br><span class="line">git clone git://github.com/项目名.git          --GIT协议</span><br><span class="line">git clone https://github.com/项目名.git      --HTTPS协议</span><br></pre></td></tr></table></figure>
+      
+    </div>
+
+    
+
+    
+    
+    
+    
+
+    
+      
+    
+    
+      <div>
+        <div id="reward-container">
+  <div>请他喝杯茶</div>
+  <button id="reward-button" disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+
+    
+      
+      
+        
+      
+      <div style="display: inline-block">
+        <img src="/images/wechatpay.png" alt="周燚乾 微信支付">
+        <p>微信支付</p>
+      </div>
+    
+      
+      
+        
+      
+      <div style="display: inline-block">
+        <img src="/images/alipay.png" alt="周燚乾 支付宝">
+        <p>支付宝</p>
+      </div>
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/实用工具/" <i class="fa fa-tag"> 实用工具</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/07/24/C++学习之路/" rel="next" title="C++学习之路（1）">
+                <i class="fa fa-chevron-left"></i> C++学习之路（1）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/09/22/git使用学习-二/" rel="prev" title="git使用学习(二)">
+                git使用学习(二) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="周燚乾">
+            
+              <p class="site-author-name" itemprop="name">周燚乾</p>
+              <div class="site-description motion-element" itemprop="description">一个想成为大佬的萌新</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives">
+                
+                    <span class="site-state-item-count">3</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">2</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">3</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/zyq-yl" title="GitHub &rarr; https://github.com/zyq-yl" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#创建版本库"><span class="nav-number">1.</span> <span class="nav-text">创建版本库</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#将文件添加到版本库"><span class="nav-number">2.</span> <span class="nav-text">将文件添加到版本库</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#显示工作区的状态和修改内容"><span class="nav-number">3.</span> <span class="nav-text">显示工作区的状态和修改内容</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#版本回退"><span class="nav-number">4.</span> <span class="nav-text">版本回退</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#撤销修改"><span class="nav-number">5.</span> <span class="nav-text">撤销修改</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#删除文件"><span class="nav-number">6.</span> <span class="nav-text">删除文件</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#添加远程仓库"><span class="nav-number">7.</span> <span class="nav-text">添加远程仓库</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#从远程库克隆"><span class="nav-number">8.</span> <span class="nav-text">从远程库克隆</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">周燚乾</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.1.1</div>
+
+
+
+<!-- 新增访客统计代码 -->
+
+<div class="busuanzi-count">
+    <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="site-uv">
+      <i class="fa fa-user"></i>
+      访问用户： <span class="busuanzi-value" id="busuanzi_value_site_uv"></span> 人
+    </span>
+    <div class="powered-by"></div>
+    <span class="site-uv">
+      <i class="fa fa-eye"></i>
+      访问次数： <span class="busuanzi-value" id="busuanzi_value_site_pv"></span> 次
+    </span>
+    <!-- 博客字数统计 -->
+    <span class="site-pv">
+      <i class="fa fa-pencil"></i>
+      博客全站共： <span class="post-count"></span> 字
+    </span>
+</div>
+<!-- 新增访客统计代码 END-->
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+    
+    
+  
+  <script color="0,0,255" opacity="0.5" zindex="-1" count="99" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/utils.js?v=7.1.1"></script>
+
+  <script src="/js/motion.js?v=7.1.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/affix.js?v=7.1.1"></script>
+
+  <script src="/js/schemes/pisces.js?v=7.1.1"></script>
+
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.1.1"></script>
+<script src="/js/post-details.js?v=7.1.1"></script>
+
+
+
+  
+
+
+  <script src="/js/next-boot.js?v=7.1.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
