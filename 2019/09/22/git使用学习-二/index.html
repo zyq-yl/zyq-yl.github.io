@@ -110,7 +110,10 @@
 <meta property="og:image" content="http://yoursite.com/2019/09/22/git使用学习-二/4.png">
 <meta property="og:image" content="http://yoursite.com/2019/09/22/git使用学习-二/5.png">
 <meta property="og:image" content="http://yoursite.com/2019/09/22/git使用学习-二/6.png">
-<meta property="og:updated_time" content="2019-09-22T06:32:46.322Z">
+<meta property="og:image" content="http://yoursite.com/2019/09/22/git使用学习-二/7.png">
+<meta property="og:image" content="http://yoursite.com/2019/09/22/git使用学习-二/8.png">
+<meta property="og:image" content="http://yoursite.com/2019/09/22/git使用学习-二/9.png">
+<meta property="og:updated_time" content="2019-09-22T13:16:39.658Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="git使用学习(二)">
 <meta name="twitter:description" content="上一次我们已经学习了git的基础命令，以及远程仓库的添加、关联和推送。接下来我们将学习git的分支管理。分支管理有什么用处呢？假如你要对一个团队项目添加新功能，但是这个功能需要花费你一周的时间。在你未完成的这段时间里，如果你进行了提交，由于代码库不完整，导致其他人无法进行工作。而如果你不提交的话，又可能会丢失你任务的进度。分支就可以解决这个问题。 你创建了一个属于你自己的分支，别人是看不到，还继续">
@@ -378,7 +381,7 @@
                 
               
 
-              <time title="创建时间：2019-09-22 14:12:35 / 修改时间：14:32:46" itemprop="dateCreated datePublished" datetime="2019-09-22T14:12:35+08:00">2019-09-22</time>
+              <time title="创建时间：2019-09-22 14:12:35 / 修改时间：21:16:39" itemprop="dateCreated datePublished" datetime="2019-09-22T14:12:35+08:00">2019-09-22</time>
             
 
             
@@ -467,7 +470,20 @@
 <p>在这种情况下，git无法执行快速合并 (分支比master超前提交，直接移动指针合并)，只能将各自的修改合并起来，不同地方的修改合并到一起，这种合并可能会发生冲突，同一处地方进行了不同的修改。</p>
 <p>冲突之后会给出提示，也可以使用<code>git status</code> 查看，手动修改解决冲突后可以再合并。</p>
 <p>使用命令<code>git log --graph</code> 可以查看分支合并流程图。</p>
-<p>使用命令<code>git log --grapy --pretty=oneline --abbrev-commit</code>可以简要查看分支的合并与提交情况。</p>
+<p>使用命令<code>git log --graph --pretty=oneline --abbrev-commit</code>可以简要查看分支的合并与提交情况。</p>
+<h1 id="分支管理策略"><a href="#分支管理策略" class="headerlink" title="分支管理策略"></a>分支管理策略</h1><p>在实际的工作中，master作为主分支，上面的代码都是稳定的，是可发行的版本，很少进行提交，保留干净的提交记录。团队工作提交都在另一个分支dev上，为项目添加特性。</p>
+<p>通常合并分支时可能会使用<code>Fast forward</code> 模式，在这种模式下，删除分支后，就会丢失掉分支信息。一般我们推荐合并的时候加入参数<code>--no-ff</code> 禁用<code>Fast forward</code> 。这样git会在合并时生成一个新的提交对象，使用命令<code>git log --graph --pretty=oneline --abbrev-commit</code>从分支历史上就可以看出分支信息，而使用<code>Fast forward</code> 模式，是看不到分支存在的记录的，每一次提交都记录在合并到的分支上。</p>
+<p>如果顺着一个分支可以到达另一个分支时，git在合并时，只会简单的将指针移动。</p>
+<p>合并前：</p>
+<img src="/2019/09/22/git使用学习-二/7.png">
+<p>使用<code>Fast forward</code> 模式合并：</p>
+<img src="/2019/09/22/git使用学习-二/8.png">
+<p>添加<code>--no-ff</code> 参数合并：</p>
+<img src="/2019/09/22/git使用学习-二/9.png">
+<p>使用<code>--no-ff</code> 参数可以使master分支上的的提交历史变得干净，只保留每次发行版本时的提交记录，而我们在分支上进行的修改则保留在dev分支上。并且，当我们的master发生了问题，我们可以很方便得返回上一个可使用的版本。</p>
+<p>命令为：</p>
+<p><code>git merge --no-ff -m&quot;提交说明&quot; branch_name</code> ，由于需要进行一次新的提交，所以需要使用参数<code>-m</code> 添加提交说明。</p>
+<p>如将dev分支合并<code>git merge --no-ff -m&quot;dev branch commit&quot; dev</code>,即可 。</p>
 
       
     </div>
@@ -710,7 +726,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#创建与合并分支"><span class="nav-number">1.</span> <span class="nav-text">创建与合并分支</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#创建分支"><span class="nav-number">1.1.</span> <span class="nav-text">创建分支</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#合并分支"><span class="nav-number">1.2.</span> <span class="nav-text">合并分支</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#删除分支"><span class="nav-number">1.3.</span> <span class="nav-text">删除分支</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#解决冲突"><span class="nav-number">2.</span> <span class="nav-text">解决冲突</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#创建与合并分支"><span class="nav-number">1.</span> <span class="nav-text">创建与合并分支</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#创建分支"><span class="nav-number">1.1.</span> <span class="nav-text">创建分支</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#合并分支"><span class="nav-number">1.2.</span> <span class="nav-text">合并分支</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#删除分支"><span class="nav-number">1.3.</span> <span class="nav-text">删除分支</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#解决冲突"><span class="nav-number">2.</span> <span class="nav-text">解决冲突</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#分支管理策略"><span class="nav-number">3.</span> <span class="nav-text">分支管理策略</span></a></li></ol></div>
             
 
           </div>
