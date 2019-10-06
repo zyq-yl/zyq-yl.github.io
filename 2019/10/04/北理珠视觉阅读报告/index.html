@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.1.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.1.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.1.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.1.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="通过对北理珠视觉源码的阅读，了解视觉处理流程，以及处理优劣。 实现原理以及流程装甲板下面是其团队给出的实现流程，我将按照这个流程来解读源码。  首先判断需要什么焦距的图像进行输入，最主要根据距离进行判断，利用官方开源的思想dist_ = (1-r_)*dist_ + r_*distance_ 其中r为刷新频率，介于0.0 - 1.0之间 distance_上一个装甲板角度解算的距离，dist用于最">
+<meta name="keywords" content="robomaster">
+<meta property="og:type" content="article">
+<meta property="og:title" content="北理珠视觉阅读报告">
+<meta property="og:url" content="http://yoursite.com/2019/10/04/北理珠视觉阅读报告/index.html">
+<meta property="og:site_name" content="夜岚苍苍的博客">
+<meta property="og:description" content="通过对北理珠视觉源码的阅读，了解视觉处理流程，以及处理优劣。 实现原理以及流程装甲板下面是其团队给出的实现流程，我将按照这个流程来解读源码。  首先判断需要什么焦距的图像进行输入，最主要根据距离进行判断，利用官方开源的思想dist_ = (1-r_)*dist_ + r_*distance_ 其中r为刷新频率，介于0.0 - 1.0之间 distance_上一个装甲板角度解算的距离，dist用于最">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://yoursite.com/2019/10/04/北理珠视觉阅读报告/blog/source/_posts/北理珠视觉阅读报告/自瞄流程图.jpg">
+<meta property="og:image" content="http://yoursite.com/2019/10/04/北理珠视觉阅读报告/blog/source/_posts/北理珠视觉阅读报告/能量机关程序流程图.png">
+<meta property="og:updated_time" content="2019-10-06T07:24:16.001Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="北理珠视觉阅读报告">
+<meta name="twitter:description" content="通过对北理珠视觉源码的阅读，了解视觉处理流程，以及处理优劣。 实现原理以及流程装甲板下面是其团队给出的实现流程，我将按照这个流程来解读源码。  首先判断需要什么焦距的图像进行输入，最主要根据距离进行判断，利用官方开源的思想dist_ = (1-r_)*dist_ + r_*distance_ 其中r为刷新频率，介于0.0 - 1.0之间 distance_上一个装甲板角度解算的距离，dist用于最">
+<meta name="twitter:image" content="http://yoursite.com/2019/10/04/北理珠视觉阅读报告/blog/source/_posts/北理珠视觉阅读报告/自瞄流程图.jpg">
+
+
+
+
+
+  
+  
+  <link rel="canonical" href="http://yoursite.com/2019/10/04/北理珠视觉阅读报告/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>北理珠视觉阅读报告 | 夜岚苍苍的博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">夜岚苍苍的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">学习历程</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/10/04/北理珠视觉阅读报告/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="周燚乾">
+      <meta itemprop="description" content="一个想成为大佬的萌新">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="夜岚苍苍的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">北理珠视觉阅读报告
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-10-04 10:17:04" itemprop="dateCreated datePublished" datetime="2019-10-04T10:17:04+08:00">2019-10-04</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-10-06 15:24:16" itemprop="dateModified" datetime="2019-10-06T15:24:16+08:00">2019-10-06</time>
+              
+            
+          </span>
+
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>通过对北理珠视觉源码的阅读，了解视觉处理流程，以及处理优劣。</p>
+<h1 id="实现原理以及流程"><a href="#实现原理以及流程" class="headerlink" title="实现原理以及流程"></a>实现原理以及流程</h1><h2 id="装甲板"><a href="#装甲板" class="headerlink" title="装甲板"></a>装甲板</h2><p>下面是其团队给出的实现流程，我将按照这个流程来解读源码。</p>
+<ol>
+<li><p>首先判断需要什么焦距的图像进行输入，最主要根据距离进行判断，利用官方开源的思想<code>dist_ = (1-r_)*dist_ + r_*distance_</code> 其中<code>r</code>为刷新频率，介于<code>0.0 - 1.0</code>之间 <code>distance_</code>上一个装甲板角度解算的距离，<code>dist</code>用于最终判断是否需要切换镜头。同时程序中加入<code>lost_cnt_ % 200 == 0 &amp;&amp; lost_cnt_ != 0</code>丢失目标自动切换以防止漏检测的情况以及避免反复更换相机的情况。</p>
+</li>
+<li><p>若使能<code>#define ROI_ENABLE</code>宏定义则通过历史数据得到目标ROI矩形</p>
+</li>
+<li><p>同时对RGB颜色及灰度进行二值化，判断灰度灯条轮廓的其中一个点是否在RGB颜色光圈的轮廓内利用<code>pointPolygonTest</code>函数，将符合条件的灰度灯条构建<code>LED_Stick</code>类，将旋转矩形角度从<code>0 - 360</code>转换成<code>-180 - 180</code>。</p>
+</li>
+<li><p>灯条进行两两配对构造<code>armor</code>类，首先初步筛选符合尺寸大小的装甲板，两灯条高度相似，高度差不大，长宽比一定范围<code>is_suitable_size</code>。</p>
+</li>
+<li><p>利用计算装甲板两个灯条中间区域的平均强度<code>get_average_intensity</code>，用于筛选装甲板中间有灯条的情况。</p>
+</li>
+<li><p>进行灯条最优匹配<code>max_match</code>，定义了<code>float f = error_angle + 0.5 * angle_8;</code>其中<code>f</code>是匹配系数，越小越匹配，<code>angle_8</code>是内八角度，当两个灯条内八是<code>angle_8</code>的值是两个灯条的角度否则是<code>0</code>。每个<code>LED_Stick</code>灯条类中有三个成员参数分别是<code>matched</code>是否已经有匹配的灯条、<code>match_index</code>对象序号、<code>match_factor</code>上述的匹配系数。当遍历灯条计算匹配系数小于之前的匹配系数，代表有更优的匹配关系，以前的匹配灯条的关系将会解除，新的更优的匹配关系将会产生。最终遍历结束得到候选装甲板。</p>
+</li>
+<li><p>利用距离图像中心点最近的方式在候选装甲板中选择一个最终装甲板，对装甲板类型进行滤波判断提取装甲板的四个顶点放入pnp解算中解算。</p>
+<p>流程图如下：</p>
+<p><img src="//yoursite.com/2019/10/04/北理珠视觉阅读报告/blog\source\_posts\北理珠视觉阅读报告\自瞄流程图.jpg" alt></p>
+</li>
+</ol>
+<h2 id="能量机关"><a href="#能量机关" class="headerlink" title="能量机关"></a>能量机关</h2><p>?                                                                                                                                                                                                               </p>
+<ol>
+<li><p>图像二值化的操作:在分区赛时使用的是BGR三通道的差值，在国赛采用灰度二值化。原因是国赛中神符蓝方的颜色明显比红方亮度暗，神符两边的颜色都要比神符颜色亮。二值化的方法很多，可以尝试更多不一样的方法。</p>
+</li>
+<li><p>找轮廓：<code>findContours</code>函数中<code>hierarchy</code>，定义为<code>vector&lt;Vec4i&gt;hirerarchy</code>，定义了一个”向量内每个元素保存了一个包含四个<code>int</code>整型变量“的向量，<code>hierarchy[i][0]~hierarchy[i][3]</code>，分别表示第i个轮廓的后一个轮廓，前一个轮廓，父轮廓，内嵌轮廓的索引编号。如果当前轮廓没有对应的后一个轮廓、前一个轮廓、父轮廓、内嵌轮廓的话，则<code>hierarchy[i][0]~hierarchy[i][3]</code>的相应位被设置为默认值-1。我们采用<code>CV_RETR_CCOMP</code>检测所有的轮廓，但所有轮廓只建立两个等级关系，外围为顶层，若外围内的内围轮廓还包含了其他的轮廓信息，则内围内的所有轮廓均归属于顶层。利用这个关系，可以发现，我们的目标是装甲板那个小轮廓，可以把没有父轮廓（<code>hierarchy[i][3]&lt;0</code>）的跳过。由于建立起了父子轮廓的关系，我们可以根据他们的面积比，周长比进行第一次粗略的筛选。将找到的轮廓画旋转矩形，按父子轮廓放入<code>Object</code>类里面，父轮廓为<code>big_rect_</code>,子轮廓（待击打目标）为<code>small_rect_</code>；</p>
+</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">if(hierarchy[i][3]&lt;0 || contours[i].size() &lt; 6)</span><br><span class="line">           continue;</span><br><span class="line"></span><br><span class="line">if(small_rect_area * 12 &gt;big_rect_area &amp;&amp; small_rect_area* area_ratio&lt;big_rect_area  &amp;&amp; small_rect_size_ratio &gt; 1 &amp;&amp; small_rect_size_ratio &lt; 3.0f)</span><br></pre></td></tr></table></figure>
+<ol start="3">
+<li>对小装甲板以及扇叶的矩形拟合采用的是椭圆拟合矩形fitEllipse。原因是椭圆拟合出来的角度更加准确。利用椭圆拟合矩形的角度，把筛选条件限定在装甲板和扇叶拟合出来的矩形的角度差值在80-110之间。</li>
+<li>在这些筛选条件之后，确定旋转矩形的四点顺序，原理为，拟合椭圆出来的矩形是以短边水平线夹角为其角度的，其角度范围为0-180。根据这个原理，我们只要判断装甲板的两条长边的中心点跟<code>big_rect_</code>中心点的距离近，就可以顺利得到装甲板四点的正确的顺序。</li>
+<li>判断旋转矩形类型，通过两旁的灯杆。利用装甲板两条宽边向圆心方向延一段比例的距离，建立两个小块roi区域，计算roi区域的平均值，若roi区域均有值，则表明目标矩形是激活的（装甲板旁边有两个杆）否则未激活。</li>
+<li>判断顺时针还是逆时针的方法是根据历史角度和当前角度的差值（要滤波）来判断.</li>
+<li>最后通过顺逆时针判断大小能量机关，更新世界坐标原点解pnp发送串口。</li>
+</ol>
+<h3 id="能量机关预测"><a href="#能量机关预测" class="headerlink" title="能量机关预测"></a>能量机关预测</h3><p>利用pnp位姿估计的原理。打击小能量机关时，直接将世界坐标系下的3D点设置在要打击的小符中心。打击大能量机关时 ，首先需要判断旋转方向，根据不同的旋转方向设置目标的世界坐标系下的点。这样，由于视觉处理等延迟，在实际云台运动中恰好能跟上目标，实现预测效果。</p>
+<p>流程图如下：</p>
+<p><img src="//yoursite.com/2019/10/04/北理珠视觉阅读报告/blog\source\_posts\北理珠视觉阅读报告\能量机关程序流程图.png" alt></p>
+<h1 id="源码解读"><a href="#源码解读" class="headerlink" title="源码解读"></a>源码解读</h1><h2 id="装甲板-1"><a href="#装甲板-1" class="headerlink" title="装甲板"></a>装甲板</h2><p>先说明一下装甲板识别所定义的基本类，对于这些类的具体内容不需要细看，只需明白其功能，在解读过程中会有需要的说明。</p>
+<h3 id="类的说明"><a href="#类的说明" class="headerlink" title="类的说明"></a>类的说明</h3><p>类LED_Stick用于存储灯条信息，并且记录是否与其他灯条进行匹配以及匹配的强度。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">class LED_Stick&#123;</span><br><span class="line">public:</span><br><span class="line"></span><br><span class="line">    LED_Stick():matched(false)&#123;&#125;</span><br><span class="line"></span><br><span class="line">    LED_Stick(const RotatedRect&amp; R)&#123;</span><br><span class="line">        rect.angle = R.angle;</span><br><span class="line">        rect.center = R.center;</span><br><span class="line">        rect.size = R.size;</span><br><span class="line">        matched = false;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    RotatedRect rect;   // 装甲板灯条相关数据信息</span><br><span class="line">    bool matched;       // 匹配状态， 用于灯条匹配</span><br><span class="line">    size_t match_index; // 匹配对应的灯条序号， 用于灯条匹配</span><br><span class="line">    float match_factor; // 匹配强度， 用于灯条匹配</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>类armor用于存储装甲板的相关信息</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">class armor&#123;</span><br><span class="line">public:</span><br><span class="line">    armor();</span><br><span class="line">    armor(const LED_Stick&amp; L1, const LED_Stick&amp; L2);</span><br><span class="line"></span><br><span class="line">    void draw_rect( Mat&amp; img, Point2f roi_offset_poin) const;    // 画出装甲板</span><br><span class="line">    void draw_spot(Mat &amp;img, Point2f roi_offset_point) const;</span><br><span class="line">    int get_average_intensity(const Mat&amp; img) ; // 计算装甲板roi平均色彩强度，用于筛选装甲板中心有灯条</span><br><span class="line">    void max_match(vector&lt;LED_Stick&gt;&amp; LED, size_t i, size_t j); // 灯条匹配算法</span><br><span class="line">    bool is_suitable_size(void) const;          // 判断可能的装甲板是否符合尺寸</span><br><span class="line"></span><br><span class="line">    LED_Stick Led_stick[2];  // 装甲板的两个灯条</span><br><span class="line">    float error_angle;       // 两个灯条的误差的角度</span><br><span class="line">    Point2i center;          // 装甲板中心点</span><br><span class="line">    Rect2i rect;             // 装甲板roi矩形</span><br><span class="line">    int average_intensity;   // 装甲板roi的平均色彩强度</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>类ArmorDetector负责装甲板的识别，角度解算，预测。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br></pre></td><td class="code"><pre><span class="line">class ArmorDetector</span><br><span class="line">&#123;</span><br><span class="line">public:</span><br><span class="line">    ArmorDetector()&#123;</span><br><span class="line">        solve_angle_ = SolveAngle(CAMERA0_FILEPATH, SHOR_X, SHOR_Y, SHOR_Z, PTZ_TO_BARREL); // 短焦角度解算</span><br><span class="line">        solve_angle_long_ = SolveAngle(CAMERA1_FILEPATH, LONG_X, LONG_Y, LONG_Z, PTZ_TO_BARREL); // 长焦角度解算</span><br><span class="line">        predict_ = Predictor(30); // 二次多项式拟合（国赛停用）</span><br><span class="line">        zeyu_predict_ = ZeYuPredict(0.01f, 0.01f, 0.01f, 0.01f, 1.0f, 3.0f);    // 二阶ｋａｌｍａｎ预测，视觉（国赛停用）</span><br><span class="line">        t_start_ = getTickCount();</span><br><span class="line">    &#125;</span><br><span class="line">    ~ArmorDetector()&#123;&#125;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * @brief 上位机初始化</span><br><span class="line">     */</span><br><span class="line">    void DebugPlotInit(MainWindow *w)&#123;</span><br><span class="line">        w_ = w;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * @brief chooseCamera 选择相机类型，长短焦切换逻辑</span><br><span class="line">     * @param 短距离阈值(mm)</span><br><span class="line">     * @param 长距离阈值(mm)</span><br><span class="line">     * @param 上一次摄像头模式</span><br><span class="line">     * @return 返回本次摄像头类型 1长焦 0短焦</span><br><span class="line">     */</span><br><span class="line">    bool chooseCamera(int short_distance, int long_distance, bool last_mode);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * @brief ArmorDetectTask 自瞄任务函数（识别，角度解算）</span><br><span class="line">     * @param img</span><br><span class="line">     * @param other_param 其他参数，其中使用到color颜色和cap_mode摄像头类型</span><br><span class="line">     * @return 返回命令 0没发现 1发现</span><br><span class="line">     */</span><br><span class="line">    int ArmorDetectTask(Mat &amp;img, OtherParam other_param);</span><br><span class="line">    void DrawTarget(Mat &amp;img)</span><br><span class="line">    &#123;</span><br><span class="line">        if(!points_2d_.empty())</span><br><span class="line">        &#123;</span><br><span class="line">            line(img, points_2d_[0],points_2d_[2],Scalar(255,100,0), 3);</span><br><span class="line">            line(img, points_2d_[1],points_2d_[3],Scalar(255,100,0), 3);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    void getAngle(float &amp;yaw, float &amp;pitch)</span><br><span class="line">    &#123;</span><br><span class="line">        yaw = angle_x_;</span><br><span class="line">        pitch = angle_y_;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">private:</span><br><span class="line">    /**</span><br><span class="line">     * @brief GetRoi 获取图像ROI区域</span><br><span class="line">     * @param img</span><br><span class="line">     * @return 返回感兴趣区域的矩形</span><br><span class="line">     */</span><br><span class="line">    Rect GetRoi(const Mat &amp;img);</span><br><span class="line">    bool makeRectSafe(cv::Rect &amp; rect, cv::Size size)&#123;</span><br><span class="line">        if (rect.x &lt; 0)</span><br><span class="line">            rect.x = 0;</span><br><span class="line">        if (rect.x + rect.width &gt; size.width)</span><br><span class="line">            rect.width = size.width - rect.x;</span><br><span class="line">        if (rect.y &lt; 0)</span><br><span class="line">            rect.y = 0;</span><br><span class="line">        if (rect.y + rect.height &gt; size.height)</span><br><span class="line">            rect.height = size.height - rect.y;</span><br><span class="line">        if (rect.width &lt;= 0 || rect.height &lt;= 0)</span><br><span class="line">            return false;</span><br><span class="line">        return true;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    /**</span><br><span class="line">     * @brief DetectArmor 装甲板识别函数</span><br><span class="line">     * @param img</span><br><span class="line">     * @param roi_rect</span><br><span class="line">     * @return</span><br><span class="line">     */</span><br><span class="line">    bool DetectArmor(Mat &amp;img, Rect roi_rect);</span><br><span class="line">    /**</span><br><span class="line">     * @brief 装甲板类型确定</span><br><span class="line">     * 通过检测历史数据判断装甲板类型，大装甲板和小装甲板</span><br><span class="line">     */</span><br><span class="line">    bool getTypeResult(bool is_small);</span><br><span class="line">    void setFilter(int filter_size)&#123;</span><br><span class="line">        filter_size_ = filter_size;</span><br><span class="line">    &#125;</span><br><span class="line">    void clear()&#123;</span><br><span class="line">        history_.clear();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">private:</span><br><span class="line">    // 外部参数</span><br><span class="line">    int color_;</span><br><span class="line">    int cap_mode_;</span><br><span class="line"></span><br><span class="line">public:</span><br><span class="line">    // ｋａｌｍａｎ滤波预测参数</span><br><span class="line">    int km_Qp_ = 1000;</span><br><span class="line">    int km_Qv_ = 1;</span><br><span class="line">    int km_Rp_ = 1;</span><br><span class="line">    int km_Rv_ = 1;</span><br><span class="line">    int km_t_ = 1;</span><br><span class="line">    int km_pt_ = 60;</span><br><span class="line">    float last_angle = 0;</span><br><span class="line">    float last_v = 0;</span><br><span class="line">    float last_last_v = 0;</span><br><span class="line"></span><br><span class="line">public:</span><br><span class="line">    // 调试参数</span><br><span class="line">    int short_offset_x_ = 100;</span><br><span class="line">    int short_offset_y_ = 100;</span><br><span class="line">    int long_offset_x_ = 100;</span><br><span class="line">    int long_offset_y_ = 100;</span><br><span class="line">    int color_th_ = 16;</span><br><span class="line">    int gray_th_ = 60;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">private:</span><br><span class="line">    // 相关类声明</span><br><span class="line">    SolveAngle solve_angle_;</span><br><span class="line">    SolveAngle solve_angle_long_;</span><br><span class="line">    ZeYuPredict zeyu_predict_;</span><br><span class="line">    Predictor predict_;</span><br><span class="line">    double t_start_;</span><br><span class="line">    MainWindow *w_;</span><br><span class="line">    Kalman1 kalman;</span><br><span class="line"></span><br><span class="line">private:</span><br><span class="line">    // ｒｏｉ参数</span><br><span class="line">    Rect last_target_;</span><br><span class="line">    int lost_cnt_ = 0;</span><br><span class="line">    int detect_cnt_ = 0;</span><br><span class="line"></span><br><span class="line">private:</span><br><span class="line">    float dist_ = 3000; // 通过距离更换相机</span><br><span class="line">    float r_ = 0.5; // 距离刷新率 (0-1)</span><br><span class="line">    int update_cap_cnt = 0; // 用于强制限制相机更新频率</span><br><span class="line">    float distance_ = 0;</span><br><span class="line">    float angle_x_ = 0;</span><br><span class="line">    float angle_y_ = 0;</span><br><span class="line">    vector&lt;Point2f&gt; points_2d_;</span><br><span class="line"></span><br><span class="line">private:</span><br><span class="line">    // 判断大小装甲板类型相关参数</span><br><span class="line">    std::list&lt;bool&gt; history_;</span><br><span class="line">    int filter_size_ = 5;</span><br><span class="line">    bool is_small_;</span><br><span class="line"></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h3 id="主要函数说明"><a href="#主要函数说明" class="headerlink" title="主要函数说明"></a>主要函数说明</h3><p>接下来便是具体实现装甲板识别的主要函数的解读了。</p>
+<ol>
+<li><p>获取ROI区域。</p>
+<p>函数：Rect GetRoi(const Mat &amp;img);   首先程序中使用<code>last_target</code>记录上一个目标ROI区域，使用<code>lost_cnt</code>记录目标丢失的情况,<code>Rect rect_tmp = last_target_;</code> 使用rect_tmp中间量来操作上一个目标区域。<code>Rect rect_roi</code> 表示当前处理的ROI区域。</p>
+<p>首先，确认上一目标区域的情况与目标丢失的情况。如果不存在上一目标区域、目标区域为整个图像、目标丢失等情况，则将<code>last_target</code> 放大到整张图像，并且当前ROI区域<code>rect_roi</code> 也放大到整张图像。具体解释写在代码注释。</p>
+</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">if(rect_tmp.x == 0 || rect_tmp.y == 0	//整张图像</span><br><span class="line">            || rect_tmp.width == 0 || rect_tmp.height == 0 //ROI为一个点</span><br><span class="line">            || lost_cnt_ &gt;= 15 || detect_cnt_%100 == 0	//不存在上一个目标区域，并且目标丢失</span><br><span class="line">        #ifndef FORCE_CHANGE_CAMERA //使用预编译头包含的程序可以不去看，一般都是写程序时调试用的，后面无关紧要的我会删掉，方便阅读。</span><br><span class="line">            || update_cap_cnt &lt; 20</span><br><span class="line">        #endif</span><br><span class="line">            )</span><br><span class="line">    &#123;</span><br><span class="line">        last_target_ = Rect(0,0,img_size.width, img_size.height);//上一目标区域为整张图像</span><br><span class="line">        rect_roi = Rect(0,0,img_size.width, img_size.height);//当前ROI区域为整张图像</span><br><span class="line">        return rect_roi;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>如果上一目标区域存在且为合适的装甲板的范围时，则根据丢失的帧数来确定要放大的ROI区域的比率。</p>
+<pre><code>//根据丢失的帧数，确定重新获取ROI区域的大小。成比例扩大ROI区域范围
+        float scale = 2;
+        if (lost_cnt_ &lt; 30)
+                scale = 3;
+        else if(lost_cnt_ &lt;= 60)
+                scale = 4;
+        else if(lost_cnt_ &lt;= 120)
+                scale = 5;
+
+    //定义ROI区域的宽，高，以及左上角的坐标。
+       int w = int(rect_tmp.width * scale);
+        int h = int(rect_tmp.height * scale);
+        int x = int(rect_tmp.x - (w - rect_tmp.width)*0.5f);
+        int y = int(rect_tmp.y - (h - rect_tmp.height)*0.5f);
+
+        rect_roi = Rect(x, y, w, h);
+
+        //据比例扩大范围可能超出图像大小
+        //makeRectSafe为类ArmorDetector的一个函数，将ROI区域的矩形范围合法化，若不能合法化则返回false
+        //将当前ROI区域放大为整张图像
+        if(makeRectSafe(rect_roi, img_size)== false)
+        {
+            rect_roi = Rect(0,0,img_size.width, img_size.height);
+        }
+</code></pre><ol start="2">
+<li><p>装甲板的识别</p>
+<p>这也是最为关键的一步。函数：bool DetectArmor(Mat &amp;img, Rect roi_rect);</p>
+<p>由于灯条会发出红蓝光，但红蓝光具体表现在灯条的边缘，在摄像头看来，灯条中间区域仍是偏白光，故根据灰度灯条轮廓的其中一个点是否在RGB颜色光圈的轮廓之内来判断是否为要选择的灯条。亮度轮廓比较连续均匀，拟合椭圆时也比较方便。</p>
+<ol>
+<li><p>将ROI区域同时对RGB颜色及灰度进行二值化。并找到两种情况下的轮廓。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">Mat roi_image = img(roi_rect);//提取ROI区域</span><br><span class="line">   Point2f offset_roi_point(roi_rect.x, roi_rect.y);</span><br><span class="line">   vector&lt;LED_Stick&gt; LED_Stick_v;  // 存储符合条件的灯条</span><br><span class="line">   Mat binary_brightness_img, binary_color_img, gray;//两个不同方式的二值化图像</span><br><span class="line">   cvtColor(roi_image,gray,COLOR_BGR2GRAY);//灰度图像</span><br><span class="line">//BGR通道分离</span><br><span class="line">   vector&lt;cv::Mat&gt; bgr;</span><br><span class="line">   split(roi_image, bgr);</span><br><span class="line">   </span><br><span class="line">   Mat result_img;</span><br><span class="line">   if(color_ == 0)</span><br><span class="line">   &#123;</span><br><span class="line">	//绿红通道相减</span><br><span class="line">       subtract(bgr[2], bgr[1], result_img);</span><br><span class="line">   &#125;else</span><br><span class="line">   &#123;</span><br><span class="line">	//红蓝通道相减</span><br><span class="line">       subtract(bgr[0], bgr[2], result_img);</span><br><span class="line">   &#125;</span><br><span class="line">   //亮度灰度的二值化</span><br><span class="line">   threshold(gray, binary_brightness_img, gray_th_, 255, CV_THRESH_BINARY);</span><br><span class="line">   //通道相减灰度的二值化</span><br><span class="line">   threshold(result_img, binary_color_img, color_th_, 255, CV_THRESH_BINARY);</span><br><span class="line">   </span><br><span class="line">   //找到轮廓</span><br><span class="line">   vector&lt;vector&lt;Point&gt;&gt; contours_light;</span><br><span class="line">   vector&lt;vector&lt;Point&gt;&gt; contours_brightness;</span><br><span class="line">   findContours(binary_color_img, contours_light, RETR_EXTERNAL, CHAIN_APPROX_NONE);</span><br><span class="line">   findContours(binary_brightness_img, contours_brightness, RETR_EXTERNAL, CHAIN_APPROX_NONE);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>判断灰度灯条轮廓的其中一个点是否在RGB颜色光圈的轮廓内。将筛选出来的灯条构建成LED_Stick类并存放在容器LED_Stick_v中。这里用到了两个函数需要先解释一下</p>
+<p>其一</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">函数原型：double pointPolygonTest(InputArray contour, Point2f pt, bool measureDist);</span><br><span class="line">   函数作用：判断一个点是否在一个contour的内部还是外部。</span><br><span class="line">   参数说明：contour – 输入findContour提取到的边缘.</span><br><span class="line">   pt – 需要检测的点.</span><br><span class="line">   measureDist – 为真，则计算检测点到边缘的距离，为负值在外部，0在边上，正值在内部。为假，则返回-1（在contour外部）、0（在contour上）、1（在contour内部)。</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+</li>
+</ol>
+<pre><code>其二
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">函数原型：double arcLength(InputArray curve,bool closed);</span><br><span class="line">   函数功能：计算曲线长度或闭合轮廓周长；</span><br><span class="line">   参数说明：，InputArray curve，一般是由图像的轮廓点组成的点集；</span><br><span class="line">   bool closed，表示输出的多边形是否封闭；true表示封闭，false表示不封闭；</span><br></pre></td></tr></table></figure>
+
+
+接下来便是源码
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">//遍历亮度轮廓，时间复杂度为O(n2)</span><br><span class="line">   for(size_t i = 0; i &lt; contours_brightness.size(); i++)</span><br><span class="line">       &#123;</span><br><span class="line">           double area = contourArea(contours_brightness[i]);//轮廓面积</span><br><span class="line">           if (area &lt; 20.0 || 1e5 &lt; area) continue;//限制灯条面积。</span><br><span class="line">           for(size_t ii = 0; ii &lt; contours_light.size(); ii++)</span><br><span class="line">           &#123;</span><br><span class="line">   			//判断灰度灯条轮廓的其中一个点是否在RGB颜色光圈的轮廓内，若是则可能为灯条</span><br><span class="line">               if(pointPolygonTest(contours_light[ii], contours_brightness[i][0], false) &gt;= 0.0 )</span><br><span class="line">               &#123;</span><br><span class="line">                   double length = arcLength(contours_brightness[i], true); // 灯条周长</span><br><span class="line">                   if (length &gt; 15 &amp;&amp; length &lt;4000)//灯条周长条件约束</span><br><span class="line">                   &#123;   // 使用拟合椭圆的方法要比拟合最小矩形提取出来的角度更精确</span><br><span class="line">                       RotatedRect RRect = fitEllipse(contours_brightness[i]);</span><br><span class="line">   </span><br><span class="line">                       // 角度换算，将拟合椭圆0~360 -&gt; -180~180</span><br><span class="line">                       if(RRect.angle&gt;90.0f)</span><br><span class="line">                           RRect.angle =  RRect.angle - 180.0f;</span><br><span class="line">                           </span><br><span class="line">                       if (fabs(RRect.angle) &lt;= 30)  // 超过一定角度的灯条不要</span><br><span class="line">                       &#123;</span><br><span class="line">                           LED_Stick r(RRect);//构建LED_Stick类</span><br><span class="line">                           LED_Stick_v.push_back(r);//存储灯条的信息</span><br><span class="line">                       &#125;</span><br><span class="line">                   &#125;</span><br><span class="line">                   break;//一个灯条只被一个轮廓包围</span><br><span class="line">               &#125;</span><br><span class="line">           &#125;</span><br></pre></td></tr></table></figure>
+</code></pre><ol start="3">
+<li><p>将灯条两两匹配，找到装甲板</p>
+<p>首先介绍一下类armor中用于匹配的一些约束条件以及匹配方式。这一步需要注意一下，虽然将两个灯条构造了一个装甲板类，并且进行了匹配，但这里装甲板的两个灯条并不一定就是真正装甲板的左右灯条。只是将两个灯条拟合成装甲板进行逻辑判断。这样可以将两个最合适的灯条筛选成装甲板并且灯条不会被重复利用，也就是说一个灯条只能参与一个装甲板的构成，大大降低了误差。</p>
+</li>
+</ol>
+<ul>
+<li>计算装甲板roi平均色彩强度，用于筛选装甲板中心有灯条</li>
+</ul>
+<pre><code>//rect为装甲板的ROI区域矩形，位于装甲板的中部，宽与高均为装甲板的2/3
+int get_average_intensity(const Mat&amp; img) {
+    if(rect.width &lt; 1 || rect.height &lt; 1 || rect.x &lt; 1 || rect.y &lt; 1
+            || rect.width + rect.x &gt; img.cols || rect.height + rect.y &gt; img.rows)
+        return 255;
+    Mat roi = img(Range(rect.y, rect.y + rect.height), Range(rect.x, rect.x + rect.width) );
+    average_intensity = static_cast&lt;int&gt;(mean(roi).val[0]);//得出ROI区域的品骏色彩强度
+    return average_intensity;
+}
+</code></pre><ul>
+<li><p>判断两灯条拟合的装甲板的两灯条是否符合尺寸，长宽比</p>
+<p>   bool is_suitable_size(void) const<br>   {</p>
+<pre><code>// 两个灯条体型相似
+if(Led_stick[0].rect.size.height*0.7f &lt; Led_stick[1].rect.size.height
+        &amp;&amp; Led_stick[0].rect.size.height*1.3f &gt; Led_stick[1].rect.size.height)
+{
+    float armor_width = fabs(Led_stick[0].rect.center.x - Led_stick[1].rect.center.x);
+    if(armor_width &gt; Led_stick[0].rect.size.width
+            &amp;&amp; armor_width &gt; Led_stick[1].rect.size.width
+            &amp;&amp; armor_width &gt; (Led_stick[0].rect.size.width+Led_stick[1].rect.size.width)*3)
+    {
+        //灯条平均高度
+        float h_max = (Led_stick[0].rect.size.height + Led_stick[1].rect.size.height)/2.0f;
+        // 两个灯条高度差不大
+        if(fabs(Led_stick[0].rect.center.y - Led_stick[1].rect.center.y) &lt; 0.8f* h_max )
+        {
+            // 长宽比判断
+            if(h_max*4.0f &gt; rect.width &amp;&amp; h_max &lt; 1.2f* rect.width)
+            {
+                return true;
+            }
+        }
+    }
+}
+return false;
+</code></pre><p>   }</p>
+</li>
+</ul>
+<ul>
+<li>灯条的匹配方式</li>
+</ul>
+<pre><code>void armor::max_match(vector&lt;LED_Stick&gt;&amp; LED,size_t i,size_t j){
+    RotatedRect R, L;
+    //左右灯条
+    if(Led_stick[0].rect.center.x &gt; Led_stick[1].rect.center.x)
+    {
+        R = Led_stick[0].rect;
+        L = Led_stick[1].rect;
+    }else
+    {
+        R = Led_stick[1].rect;
+        L = Led_stick[0].rect;
+    }
+    //获得两灯条的匹配强度，即角度的偏差大小，越小匹配强度越强
+    float angle_8 = L.angle - R.angle;
+    if(angle_8 &lt; 1e-3f)
+        angle_8 = 0.0f;
+    //error_angle拟合装甲板的偏差角度
+    float f = error_angle + 0.5 * angle_8;
+
+    //两灯条均为匹配，将两灯条匹配，并赋值匹配强度，在互相将自己的序号赋值给对应匹配的灯条
+    if(!LED.at(i).matched &amp;&amp; !LED.at(j).matched )
+    {
+
+        LED.at(i).matched = true;
+        LED.at(i).match_index = j;
+        LED.at(j).matched = true;
+        LED.at(j).match_index = i;
+        LED.at(i).match_factor = f;
+        LED.at(j).match_factor = f;
+    }
+    //一个灯条已匹配，一个为匹配，原理相同。当当前匹配灯条的匹配强度大于已匹配灯条的匹配强度时，将已匹配灯条的对应灯条的匹配标识match置为false在将当前两灯条匹配，并赋值匹配强度和对应序号。后两种情况基本相似。
+    if(LED.at(i).matched &amp;&amp; !LED.at(j).matched)
+    {
+        if(f &lt; LED.at(i).match_factor)
+        {
+            LED.at(LED.at(i).match_index).matched = false;
+            LED.at(i).match_factor = f;
+            LED.at(i).match_index = j;
+            LED.at(j).matched = true;
+            LED.at(j).match_factor = f;
+            LED.at(j).match_index = i;
+
+        }
+    }
+    if(LED.at(j).matched &amp;&amp; !LED.at(i).matched)
+    {
+        if(f &lt; LED.at(j).match_factor )
+        {
+            LED.at(LED.at(j).match_index).matched = false;
+            LED.at(j).match_factor = f;
+            LED.at(j).match_index = i;
+            LED.at(i).matched = true;
+            LED.at(i).match_factor = f;
+            LED.at(i).match_index = j;
+        }
+    }
+    //两灯条都已匹配，并且匹配度都小于正在匹配的灯条，则更改匹配
+    if(LED.at(j).matched &amp;&amp; LED.at(i).matched
+            &amp;&amp; LED.at(i).match_factor &gt; f &amp;&amp; LED.at(j).match_factor &gt; f)
+    {
+        LED.at(LED.at(j).match_index).matched = false;
+        LED.at(LED.at(i).match_index).matched = false;
+        LED.at(i).matched = true;
+        LED.at(i).match_factor = f;
+        LED.at(i).match_index = j;
+        LED.at(j).matched = true;
+        LED.at(j).match_factor = f;
+        LED.at(j).match_index = i;
+    }
+}
+</code></pre><ol start="4">
+<li><p>接下来便是匹配装甲板的函数调用流程</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">for(size_t i = 0; i &lt; LED_Stick_v.size()-1 ; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        for(size_t j = i + 1; j &lt; LED_Stick_v.size() ; j++)</span><br><span class="line">        &#123;</span><br><span class="line">        	//构造一个armor对象</span><br><span class="line">            armor arm_tmp( LED_Stick_v.at(i), LED_Stick_v.at(j) );</span><br><span class="line">            if (arm_tmp.error_angle &lt; 8.0f)//偏差角度约束</span><br><span class="line">            &#123;</span><br><span class="line">                // TODO(cz): 推荐加入灯条宽度要小于装甲板宽度的条件</span><br><span class="line">                if(arm_tmp.is_suitable_size())</span><br><span class="line">                &#123;</span><br><span class="line">                    // TODO(cz): 推荐使用255值的面积进行判断</span><br><span class="line">                    if(arm_tmp.get_average_intensity(gray)&lt; 50 )</span><br><span class="line">                    &#123;</span><br><span class="line">                        arm_tmp.max_match(LED_Stick_v, i, j);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<ol start="5">
+<li><p>确定最终的装甲板</p>
+<p>上一步匹配装甲板的实质其实是将两个可以匹配成装甲板的灯条的匹配标识以及对应匹配序号对应起来，这一步便是将这两个最适合的灯条匹配起来。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">vector&lt;armor&gt; final_armor_list;//存放最终确定的装甲板</span><br><span class="line">    for(size_t i = 0; i &lt; LED_Stick_v.size() ; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        if(LED_Stick_v.at(i).matched)//当灯条存在匹配对象时，才构造成装甲板</span><br><span class="line">        &#123;</span><br><span class="line">        	//将对应匹配的灯条的匹配标识置为fasle，避免重复构造相同的装甲板并减少次数</span><br><span class="line">            LED_Stick_v.at(LED_Stick_v.at(i).match_index).matched = false; //clear another matching flag</span><br><span class="line">            armor arm_tmp( LED_Stick_v.at(i), LED_Stick_v.at(LED_Stick_v.at(i).match_index));</span><br><span class="line">            final_armor_list.push_back(arm_tmp);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<ol start="3">
+<li><p>根据距离图像中心最短选择要打击的装甲板</p>
+<ol>
+<li><p>根据距离ROI区域的距离选择最近的装甲板</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">	float dist=1e8;//默认距离</span><br><span class="line">    bool found_flag = false;//判断有无目标的标识</span><br><span class="line">    armor target;//打击目标的装甲板</span><br><span class="line">    Point2f roi_center(roi_rect.width/2, roi_rect.height/2);//roi区域的中心</span><br><span class="line">    float dx,dy;</span><br><span class="line">    for (size_t i = 0; i &lt; final_armor_list.size() ; i++ )</span><br><span class="line">    &#123;</span><br><span class="line">#ifdef FAST_DISTANCE	//这两种处理方式还未明白，应该是跟摄像头的使用有关</span><br><span class="line">        dx = fabs(final_armor_list.at(i).center.x - roi_center.x);</span><br><span class="line">        dy = fabs(final_armor_list.at(i).center.y - roi_center.y);</span><br><span class="line">#else</span><br><span class="line">        dx = pow((final_armor_list.at(i).center.x - roi_center.x), 2.0f);</span><br><span class="line">        dy = pow((final_armor_list.at(i).center.y - roi_center.y), 2.0f);</span><br><span class="line">#endif</span><br><span class="line">        if( dx + dy &lt; dist)&#123;//为了速度没有使用平方再开方</span><br><span class="line">            target = final_armor_list.at(i);</span><br><span class="line">            dist = dx + dy;</span><br><span class="line">        &#125;</span><br><span class="line">        found_flag = true;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>计算装甲板的四个顶点</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line">	RotatedRect target_rect;//目标矩形</span><br><span class="line">    if(found_flag)//目标存在</span><br><span class="line">    &#123;</span><br><span class="line">        Point2f point_tmp[4];</span><br><span class="line">        Point2f point_2d[4];//存放装甲板的四个顶点</span><br><span class="line">        // 左右灯条分类，分别提取装甲板四个外角点</span><br><span class="line">        RotatedRect R, L;</span><br><span class="line">        if(target.Led_stick[0].rect.center.x &gt; target.Led_stick[1].rect.center.x)</span><br><span class="line">        &#123;</span><br><span class="line">            R = target.Led_stick[0].rect;</span><br><span class="line">            L = target.Led_stick[1].rect;</span><br><span class="line">        &#125;else</span><br><span class="line">        &#123;</span><br><span class="line">            R = target.Led_stick[1].rect;</span><br><span class="line">            L = target.Led_stick[0].rect;</span><br><span class="line">        &#125;</span><br><span class="line">        //将装甲板的四个顶点对应</span><br><span class="line">        L.points(point_tmp);</span><br><span class="line">        point_2d[0] = point_tmp[1];</span><br><span class="line">        point_2d[3] = point_tmp[0];</span><br><span class="line">        R.points(point_tmp);</span><br><span class="line">        point_2d[1] = point_tmp[2];</span><br><span class="line">        point_2d[2] = point_tmp[3];</span><br><span class="line">        </span><br><span class="line">        // 计算补偿，用于调试调整准心</span><br><span class="line">        Point2f offset_point;</span><br><span class="line">        if(cap_mode_ == 0)</span><br><span class="line">        &#123;</span><br><span class="line">            offset_point = Point2f(100, 100) - Point2f(short_offset_x_,short_offset_y_);</span><br><span class="line">        &#125;</span><br><span class="line">        else</span><br><span class="line">        &#123;</span><br><span class="line">            offset_point = Point2f(100, 100) - Point2f(long_offset_x_,long_offset_y_);</span><br><span class="line">        &#125;</span><br><span class="line">		//调整roi区域和装甲板的范围</span><br><span class="line">        points_2d_.clear();</span><br><span class="line">        vector&lt;Point2f&gt; points_roi_tmp;</span><br><span class="line">        for(int i=0;i&lt;4;i++)</span><br><span class="line">        &#123;</span><br><span class="line">            points_roi_tmp.push_back(point_2d[i] + offset_roi_point);</span><br><span class="line">            points_2d_.push_back(point_2d[i] + offset_roi_point +offset_point);</span><br><span class="line">        &#125;</span><br><span class="line">        // 计算当前装甲板类型，到后面task中还有滤波，可以有误差</span><br><span class="line">        float armor_h = target.rect.height;</span><br><span class="line">        float armor_w = target.rect.width;</span><br><span class="line">        if(armor_w / armor_h &lt; 3.3f)//根据宽与高的比判断是否为小装甲板</span><br><span class="line">            is_small_ = 1;</span><br><span class="line">        else</span><br><span class="line">            is_small_ = 0;</span><br><span class="line"></span><br><span class="line">        //计算ROI的相关参数</span><br><span class="line">        last_target_ = boundingRect(points_roi_tmp);//获得包围ROI区域的最小矩形边框，作为处理下一帧时的上一个目标</span><br><span class="line">        lost_cnt_ = 0;//丢失帧数置为0</span><br><span class="line">    &#125;else &#123;//没有目标时</span><br><span class="line">        //计算ROI的相关参数</span><br><span class="line">        lost_cnt_ ++;//丢失帧数加1</span><br><span class="line">    &#125;</span><br><span class="line">    detect_cnt_++;//检测帧数加1</span><br><span class="line">    return found_flag;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+</li>
+</ol>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>虽然整个流程内容繁多，处理的细节也很多，但条理很清晰，仔细思考也能理解。而封装成函数后找到打击目标只需要简单调用这两个函数。</p>
+<ol>
+<li>通过函数Rect GetRoi(const Mat &amp;img)获取图像的ROI区域，</li>
+<li>通过函数DetectArmor(Mat &amp;img, Rect roi_rect);可以找到要打击装甲板</li>
+</ol>
+<h2 id="能量机关-1"><a href="#能量机关-1" class="headerlink" title="能量机关"></a>能量机关</h2><p>使用函数bool DetectBuff(Mat&amp; img, OtherParam other_param)；</p>
+<p>结构体<code>OtherParam</code> 统一传递串口通信中产生的数据</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">struct OtherParam</span><br><span class="line">&#123;</span><br><span class="line">    int color = 1;       // 我方车辆颜色，0是蓝色，1是红色。用于图像预处理</span><br><span class="line">    int mode = 0;        // 视觉模式，0是自瞄模式，1是能量机关模式</span><br><span class="line">    int cap_mode = 1;    // 摄像头类型，0是短焦摄像头，1是长焦摄像头</span><br><span class="line">    float gimbal_data;</span><br><span class="line">    float buff_offset_x;</span><br><span class="line">    float buff_offset_y;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>类<code>Object</code> 用于构造能量机关的对象</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">class Object</span><br><span class="line">&#123;</span><br><span class="line">public:</span><br><span class="line">    Object()&#123;&#125;</span><br><span class="line">    void DrawTarget(Mat &amp;img)</span><br><span class="line">    &#123;</span><br><span class="line">        if(type_ == INACTION)</span><br><span class="line">            circle(img, small_rect_.center, 3, Scalar(0, 0, 255), -1);</span><br><span class="line">        else if(type_ == ACTION)</span><br><span class="line">            circle(img, small_rect_.center, 3, Scalar(255, 255, 255), -1);</span><br><span class="line">        else</span><br><span class="line">            circle(img, small_rect_.center, 3, Scalar(255, 255, 255), 1);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    void UpdateOrder(); // 更新能量机关装甲板的绝对位置</span><br><span class="line">    void KnowYourself(Mat &amp;img);    //判断能量机关扇叶的状态（激活　未激活）</span><br><span class="line"></span><br><span class="line">    RotatedRect small_rect_;    // 能量机关扇叶内轮廓</span><br><span class="line">    RotatedRect big_rect_;  // 能量机关扇叶外轮廓</span><br><span class="line">    vector&lt;Point2f&gt; points_2d_; // ｐｎｐ角度解算的四个点</span><br><span class="line">    float angle_;</span><br><span class="line">    float diff_angle;</span><br><span class="line">    int type_ = UNKOWN;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<ol>
+<li><p>图像二值化,利用通道相减再二值化。被预编译头包围的是调试用的阈值。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">	//高斯模糊</span><br><span class="line">    GaussianBlur(img, img, Size(3,3),0);</span><br><span class="line">    // **预处理** -图像进行相应颜色的二值化</span><br><span class="line">    points_2d.clear();//将打击装甲板的角点置为空</span><br><span class="line">    </span><br><span class="line">    //通道分离，根据自身颜色来得到RGB灰度图</span><br><span class="line">    vector&lt;cv::Mat&gt; bgr;</span><br><span class="line">    split(img, bgr);</span><br><span class="line">    Mat result_img;</span><br><span class="line">    if(color_ != 0)</span><br><span class="line">    &#123;</span><br><span class="line">        subtract(bgr[2], bgr[1], result_img);</span><br><span class="line">    &#125;else</span><br><span class="line">    &#123;</span><br><span class="line">        subtract(bgr[0], bgr[2], result_img);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    //图像二值化</span><br><span class="line">    Mat binary_color_img;</span><br><span class="line">#ifdef TEST_OTSU</span><br><span class="line">    double th = threshold(result_img, binary_color_img, 50, 255, CV_THRESH_BINARY|CV_THRESH_OTSU);</span><br><span class="line">    if(th-10&gt;0)</span><br><span class="line">        threshold(result_img, binary_color_img, th-10, 255, CV_THRESH_BINARY);</span><br><span class="line">#endif</span><br><span class="line">#ifndef TEST_OTSU</span><br><span class="line">    threshold(result_img, binary_color_img, color_th_, 255, CV_THRESH_BINARY);</span><br><span class="line">#endif</span><br><span class="line">    //        Mat element = getStructuringElement(MORPH_RECT, Size(5,5));</span><br><span class="line">    //        morphologyEx(binary_color_img,binary_color_img,MORPH_CLOSE,element);</span><br><span class="line">    //        dilate(img, img, element);</span><br><span class="line">#ifdef DEBUG_BUFF_DETECT</span><br><span class="line">    imshow(&quot;mask&quot;, binary_color_img);</span><br><span class="line">#endif</span><br><span class="line"></span><br><span class="line">#ifdef TEST_OTSU</span><br><span class="line">    if(th &lt; 20)</span><br><span class="line">        return 0;</span><br><span class="line">#endif</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<ol start="2">
+<li><p>找轮廓。首先需要明确扇叶与装甲板的关系，我们要打击的装甲板的轮廓是扇叶的子轮廓，因为我们需要根据扇叶的状态来判断目标是否激活，所以我们要找到扇叶的轮廓。也就是说我们需要找到有父轮廓的轮廓，其父轮廓为扇叶的轮廓，子轮廓为装甲板的轮廓。分别存放在Object类对象的  <code>big_rect_</code> 和<code>small_rect_</code>  中。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">// **寻找击打矩形目标** -通过几何关系</span><br><span class="line">    // 寻找识别物体并分类到object</span><br><span class="line">    vector&lt;Object&gt; vec_target;//存放扇叶</span><br><span class="line">    vector&lt;Rect&gt; vec_color_rect;</span><br><span class="line">    vector&lt;vector&lt;Point&gt;&gt; contours;</span><br><span class="line">    vector&lt;Vec4i&gt; hierarchy;</span><br><span class="line">    findContours(binary_color_img,contours,hierarchy,CV_RETR_CCOMP,CHAIN_APPROX_NONE);</span><br><span class="line">    for(size_t i=0; i &lt; contours.size();i++)</span><br><span class="line">    &#123;</span><br><span class="line"></span><br><span class="line">        // 用于寻找小轮廓，没有父轮廓的跳过, 以及不满足6点拟合椭圆</span><br><span class="line">        if(hierarchy[i][3]&lt;0 || contours[i].size() &lt; 6 || contours[static_cast&lt;uint&gt;(hierarchy[i][3])].size() &lt; 6)</span><br><span class="line">            continue;</span><br><span class="line"></span><br><span class="line">        // 小轮廓面积条件</span><br><span class="line">        double small_rect_area = contourArea(contours[i]);</span><br><span class="line">        double small_rect_length = arcLength(contours[i],true);</span><br><span class="line">        if(small_rect_length &lt; 10)</span><br><span class="line">            continue;</span><br><span class="line">        // 用于超预测时比例扩展时矩形的判断</span><br><span class="line">        Rect rect = boundingRect(contours[static_cast&lt;uint&gt;(hierarchy[i][3])]);</span><br><span class="line">        vec_color_rect.push_back(rect);</span><br><span class="line"></span><br><span class="line">        if(small_rect_area &lt; 200)</span><br><span class="line">            continue;</span><br><span class="line">        // 大轮廓面积条件</span><br><span class="line">        double big_rect_area = contourArea(contours[static_cast&lt;uint&gt;(hierarchy[i][3])]);</span><br><span class="line">        double big_rect_length = arcLength(contours[static_cast&lt;uint&gt;(hierarchy[i][3])],true);</span><br><span class="line">        if(big_rect_area &lt; 300)</span><br><span class="line">            continue;</span><br><span class="line">        if(big_rect_length &lt; 50)</span><br><span class="line">            continue;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<ol start="3">
+<li><p>装甲板和扇叶的椭圆拟合。上一步根据扇叶和装甲板的面积初步筛选出可以拟合的轮廓，这一步便是进一步将能量机关扇叶进行拟合。可分为椭圆拟合与最小包围面积矩形拟合，椭圆拟合的筛选条件更加严格。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">       // 能量机关扇叶进行拟合</span><br><span class="line">        Object object;</span><br><span class="line">        </span><br><span class="line">        //根据条件不同拟合的方式也有所差别</span><br><span class="line">        //椭圆拟合</span><br><span class="line">#ifdef FUSION_MINAREA_ELLIPASE</span><br><span class="line"></span><br><span class="line">        object.small_rect_=fitEllipse(contours[i]);</span><br><span class="line">        object.big_rect_ = fitEllipse(contours[static_cast&lt;uint&gt;(hierarchy[i][3])]);</span><br><span class="line">#else//最小包围面积矩形拟合</span><br><span class="line">        object.small_rect_=minAreaRect(contours[i]);</span><br><span class="line">        object.big_rect_ = minAreaRect(contours[static_cast&lt;uint&gt;(hierarchy[i][3])]);</span><br><span class="line">#endif</span><br><span class="line"></span><br><span class="line">//以椭圆进行拟合时，计算出扇叶与装甲板的角度差，装甲板的宽与高的比例，并根据这些条件进行筛选</span><br><span class="line">#ifdef FUSION_MINAREA_ELLIPASE</span><br><span class="line">        object.diff_angle=fabsf(object.big_rect_.angle-object.small_rect_.angle);</span><br><span class="line"></span><br><span class="line">        if(object.small_rect_.size.height/object.small_rect_.size.width &lt; 3)</span><br><span class="line">        &#123;</span><br><span class="line">            if(object.diff_angle&lt;100 &amp;&amp; object.diff_angle&gt;80)</span><br><span class="line">            &#123;</span><br><span class="line"></span><br><span class="line">                float small_rect_size_ratio;</span><br><span class="line">                if(object.small_rect_.size.width &gt; object.small_rect_.size.height)</span><br><span class="line">                &#123;</span><br><span class="line">                    small_rect_size_ratio = object.small_rect_.size.width/object.small_rect_.size.height;</span><br><span class="line">                &#125;else &#123;</span><br><span class="line">                    small_rect_size_ratio = object.small_rect_.size.height/object.small_rect_.size.width;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                float small_rect_size_ratio;</span><br><span class="line">                small_rect_size_ratio = object.small_rect_.size.height/object.small_rect_.size.width;</span><br><span class="line">#endif</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>找到旋转矩阵。根据面积来判断扇叶的类型。利用装甲板两条宽边向圆心方向延一段比例的距离，建立两个小块roi区域，计算roi区域的平均值，若roi区域均有值，则表明目标矩形是激活的（装甲板旁边有两个杆）否则未激活。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">// 根据轮廓面积进行判断扇叶类型</span><br><span class="line"></span><br><span class="line">                double area_ratio = area_ratio_/100;//面积比例</span><br><span class="line">                if(small_rect_area * 12 &gt;big_rect_area &amp;&amp; small_rect_area* area_ratio&lt;big_rect_area</span><br><span class="line">                        &amp;&amp; small_rect_size_ratio &gt; 1 &amp;&amp; small_rect_size_ratio &lt; 3.0f)//已打击</span><br><span class="line">                &#123;</span><br><span class="line">                    object.type_ = ACTION;  // 已经激活类型</span><br><span class="line">                &#125;else if(small_rect_area * area_ratio&gt;=big_rect_area &amp;&amp; small_rect_area *2 &lt; big_rect_area</span><br><span class="line">                         &amp;&amp; small_rect_size_ratio &gt; 1 &amp;&amp; small_rect_size_ratio &lt; 3.0f)//待打击</span><br><span class="line">                &#123;</span><br><span class="line"></span><br><span class="line">                    // 更新世界坐标系顺序</span><br><span class="line">                    object.type_ = INACTION;    // 未激活类型</span><br><span class="line">                    object.UpdateOrder();//将装甲板的四个顶点的位置顺序存储起来</span><br><span class="line">                    object.KnowYourself(binary_color_img);//在装甲板附近选取两小块roi区域，计算平均值，若有值存在则表示已激活</span><br><span class="line">                    vec_target.push_back(object);</span><br><span class="line">                &#125;else</span><br><span class="line">                &#123;</span><br><span class="line">                    object.type_ = UNKOWN;    // 未激活类型</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">#ifdef FUSION_MINAREA_ELLIPASE</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">#endif</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>选择打击目标</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">// 遍历所有结果并处理\选择需要击打的目标</span><br><span class="line">    Object final_target;</span><br><span class="line">    bool find_flag = false;</span><br><span class="line">    float diff_angle = 1e8;</span><br><span class="line">    // 你需要击打的能量机关类型 1(true)击打未激活 0(false)击打激活</span><br><span class="line">    for(size_t i=0; i &lt; vec_target.size(); i++)</span><br><span class="line">    &#123;</span><br><span class="line">        Object object_tmp = vec_target.at(i);</span><br><span class="line">        // 普通模式击打未激活机关</span><br><span class="line">        if(object_tmp.type_ == INACTION)&#123;</span><br><span class="line">            find_flag = true;</span><br><span class="line">            float ang = fabs(vec_target[i].diff_angle-90.0f);</span><br><span class="line">            if(ang &lt; diff_angle)//根据角度筛选</span><br><span class="line">            &#123;</span><br><span class="line">                final_target = vec_target.at(i);</span><br><span class="line">                diff_angle = ang;</span><br><span class="line">            &#125;</span><br><span class="line">			//进行补偿</span><br><span class="line">            Point2f buff_offset = Point2f(buff_offset_x_ - 100, 100 - buff_offset_y_);</span><br><span class="line">            vector&lt;Point2f&gt; vec_points_2d_tmp;</span><br><span class="line">            for(size_t k=0; k &lt; 4; k++)</span><br><span class="line">            &#123;</span><br><span class="line">                vec_points_2d_tmp.push_back(final_target.points_2d_.at(k) + buff_offset);</span><br><span class="line">            &#125;</span><br><span class="line">            points_2d = vec_points_2d_tmp;//最终打击目标的点</span><br><span class="line">            buff_angle_ = final_target.angle_;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    return find_flag;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+    
+
+    
+      
+    
+    
+      <div>
+        <div id="reward-container">
+  <div>请他喝杯茶</div>
+  <button id="reward-button" disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+
+    
+      
+      
+        
+      
+      <div style="display: inline-block">
+        <img src="/images/wechatpay.png" alt="周燚乾 微信支付">
+        <p>微信支付</p>
+      </div>
+    
+      
+      
+        
+      
+      <div style="display: inline-block">
+        <img src="/images/alipay.png" alt="周燚乾 支付宝">
+        <p>支付宝</p>
+      </div>
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/robomaster/" <i class="fa fa-tag"> robomaster</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/09/22/git使用学习-二/" rel="next" title="git使用学习(二)">
+                <i class="fa fa-chevron-left"></i> git使用学习(二)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="周燚乾">
+            
+              <p class="site-author-name" itemprop="name">周燚乾</p>
+              <div class="site-description motion-element" itemprop="description">一个想成为大佬的萌新</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives">
+                
+                    <span class="site-state-item-count">4</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">2</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">3</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/zyq-yl" title="GitHub &rarr; https://github.com/zyq-yl" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#实现原理以及流程"><span class="nav-number">1.</span> <span class="nav-text">实现原理以及流程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#装甲板"><span class="nav-number">1.1.</span> <span class="nav-text">装甲板</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#能量机关"><span class="nav-number">1.2.</span> <span class="nav-text">能量机关</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#能量机关预测"><span class="nav-number">1.2.1.</span> <span class="nav-text">能量机关预测</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#源码解读"><span class="nav-number">2.</span> <span class="nav-text">源码解读</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#装甲板-1"><span class="nav-number">2.1.</span> <span class="nav-text">装甲板</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#类的说明"><span class="nav-number">2.1.1.</span> <span class="nav-text">类的说明</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#主要函数说明"><span class="nav-number">2.1.2.</span> <span class="nav-text">主要函数说明</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">2.1.3.</span> <span class="nav-text">总结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#能量机关-1"><span class="nav-number">2.2.</span> <span class="nav-text">能量机关</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">周燚乾</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.1.1</div>
+
+
+
+<!-- 新增访客统计代码 -->
+
+<div class="busuanzi-count">
+    <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="site-uv">
+      <i class="fa fa-user"></i>
+      访问用户： <span class="busuanzi-value" id="busuanzi_value_site_uv"></span> 人
+    </span>
+    <div class="powered-by"></div>
+    <span class="site-uv">
+      <i class="fa fa-eye"></i>
+      访问次数： <span class="busuanzi-value" id="busuanzi_value_site_pv"></span> 次
+    </span>
+    <!-- 博客字数统计 -->
+    <span class="site-pv">
+      <i class="fa fa-pencil"></i>
+      博客全站共： <span class="post-count"></span> 字
+    </span>
+</div>
+<!-- 新增访客统计代码 END-->
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+    
+    
+  
+  <script color="0,0,255" opacity="0.5" zindex="-1" count="99" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/utils.js?v=7.1.1"></script>
+
+  <script src="/js/motion.js?v=7.1.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/affix.js?v=7.1.1"></script>
+
+  <script src="/js/schemes/pisces.js?v=7.1.1"></script>
+
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.1.1"></script>
+<script src="/js/post-details.js?v=7.1.1"></script>
+
+
+
+  
+
+
+  <script src="/js/next-boot.js?v=7.1.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
