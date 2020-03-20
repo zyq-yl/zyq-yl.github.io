@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.1.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.1.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.1.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.1.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="上一次我们已经学习了git的基础命令，以及远程仓库的添加、关联和推送。接下来我们将学习git的分支管理。分支管理有什么用处呢？假如你要对一个团队项目添加新功能，但是这个功能需要花费你一周的时间。在你未完成的这段时间里，如果你进行了提交，由于代码库不完整，导致其他人无法进行工作。而如果你不提交的话，又可能会丢失你任务的进度。分支就可以解决这个问题。 你创建了一个属于你自己的分支，别人是看不到，还继续">
+<meta name="keywords" content="实用工具">
+<meta property="og:type" content="article">
+<meta property="og:title" content="git使用学习(二)">
+<meta property="og:url" content="http://yoursite.com/2019/09/22/git/git使用学习-二/index.html">
+<meta property="og:site_name" content="夜岚苍苍的博客">
+<meta property="og:description" content="上一次我们已经学习了git的基础命令，以及远程仓库的添加、关联和推送。接下来我们将学习git的分支管理。分支管理有什么用处呢？假如你要对一个团队项目添加新功能，但是这个功能需要花费你一周的时间。在你未完成的这段时间里，如果你进行了提交，由于代码库不完整，导致其他人无法进行工作。而如果你不提交的话，又可能会丢失你任务的进度。分支就可以解决这个问题。 你创建了一个属于你自己的分支，别人是看不到，还继续">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://yoursite.com/2019/09/22/git/git使用学习-二/1.png">
+<meta property="og:image" content="http://yoursite.com/2019/09/22/git/git使用学习-二/2.png">
+<meta property="og:image" content="http://yoursite.com/2019/09/22/git/git使用学习-二/3.png">
+<meta property="og:image" content="http://yoursite.com/2019/09/22/git/git使用学习-二/4.png">
+<meta property="og:image" content="http://yoursite.com/2019/09/22/git/git使用学习-二/5.png">
+<meta property="og:image" content="http://yoursite.com/2019/09/22/git/git使用学习-二/6.png">
+<meta property="og:image" content="http://yoursite.com/2019/09/22/git/git使用学习-二/7.png">
+<meta property="og:image" content="http://yoursite.com/2019/09/22/git/git使用学习-二/8.png">
+<meta property="og:image" content="http://yoursite.com/2019/09/22/git/git使用学习-二/9.png">
+<meta property="og:updated_time" content="2019-09-22T13:16:39.658Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="git使用学习(二)">
+<meta name="twitter:description" content="上一次我们已经学习了git的基础命令，以及远程仓库的添加、关联和推送。接下来我们将学习git的分支管理。分支管理有什么用处呢？假如你要对一个团队项目添加新功能，但是这个功能需要花费你一周的时间。在你未完成的这段时间里，如果你进行了提交，由于代码库不完整，导致其他人无法进行工作。而如果你不提交的话，又可能会丢失你任务的进度。分支就可以解决这个问题。 你创建了一个属于你自己的分支，别人是看不到，还继续">
+<meta name="twitter:image" content="http://yoursite.com/2019/09/22/git/git使用学习-二/1.png">
+
+
+
+
+
+  
+  
+  <link rel="canonical" href="http://yoursite.com/2019/09/22/git/git使用学习-二/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>git使用学习(二) | 夜岚苍苍的博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">夜岚苍苍的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">学习历程</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/09/22/git/git使用学习-二/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="周燚乾">
+      <meta itemprop="description" content="编程之路">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="夜岚苍苍的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">git使用学习(二)
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-09-22 14:12:35 / 修改时间：21:16:39" itemprop="dateCreated datePublished" datetime="2019-09-22T14:12:35+08:00">2019-09-22</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Git/" itemprop="url" rel="index"><span itemprop="name">Git</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>上一次我们已经学习了git的基础命令，以及远程仓库的添加、关联和推送。接下来我们将学习git的分支管理。分支管理有什么用处呢？假如你要对一个团队项目添加新功能，但是这个功能需要花费你一周的时间。在你未完成的这段时间里，如果你进行了提交，由于代码库不完整，导致其他人无法进行工作。而如果你不提交的话，又可能会丢失你任务的进度。分支就可以解决这个问题。</p>
+<p>你创建了一个属于你自己的分支，别人是看不到，还继续在原来的分支上正常工作，而你在自己的分支上干活，想提交就提交，直到开发完毕后，再一次性合并到原来的分支上，这样，既安全，又不影响别人工作。</p>
+<h1 id="创建与合并分支"><a href="#创建与合并分支" class="headerlink" title="创建与合并分支"></a>创建与合并分支</h1><p>每次提交，Git都把它们串成一条时间线，这条时间线就是一个分支。在你未创建其他分支的情况下，只有一条分支master，也是主分支。master指向这个分支上的最新提交，每进行一次提交，master都会移动指向最新串入的提交点。HEAD指针指向当前分支，每创建一个分支都会新建一个指向master的指针，通过HEAD和分支的指针就可以确定当前分支以及提交点。</p>
+<p>最开始的时候，master分支是一条线，指向最新的提交：</p>
+<img src="/2019/09/22/git/git使用学习-二/1.png">
+<p>创建分支，指针branch指向master，并将HEAD指向branch后：</p>
+<img src="/2019/09/22/git/git使用学习-二/2.png">
+<p>从现在开始，进行的修改和提交在branch分支上进行，master分支不变：</p>
+<img src="/2019/09/22/git/git使用学习-二/3.png">
+<p>将分支合并到主分支上：</p>
+<img src="/2019/09/22/git/git使用学习-二/4.png">
+<p>合并完分支后可以删除branch指针，只保留主分支：</p>
+<img src="/2019/09/22/git/git使用学习-二/5.png">
+<p>git分支的合并就是指针的移动，所以速度非常快。</p>
+<h2 id="创建分支"><a href="#创建分支" class="headerlink" title="创建分支"></a>创建分支</h2><p>使用命令<code>git branch dev</code>表示创建dev分支</p>
+<p>使用命令<code>git checkout dev</code>切换到dev分支</p>
+<p>可使用命令<code>git checkout -b dev</code>表示创建并切换到dev分支</p>
+<p>在前面的撤销修改中，我们使用的就是<code>git checkout</code> 为了避免混淆，我们可以使用<code>git switch</code> 来切换分支。<code>git switch dev</code> 表示切换到dev分支，<code>git switch -c dev</code> 表示创建并切换到dev分支。</p>
+<p>切换分支后，可放心在此进行修改提交，均不会干扰其它分支。但是需要注意一点，对于所有分支来说，工作区和暂存区是公共的，如果你在一个分支进行了修改，但是没有进行提交，那么在所有的分支上都可以看到进行的修改。</p>
+<p>使用命令<code>git branch</code> 可以显示所有分支，以及当前分支。当前分支前会有*标识出来。</p>
+<h2 id="合并分支"><a href="#合并分支" class="headerlink" title="合并分支"></a>合并分支</h2><p>命令<code>git merge 分支名</code></p>
+<p>使用命令<code>git merge dev</code> 将dev分支合并到master上，现在仓库的最新版本就是合并后的版本了。</p>
+<h2 id="删除分支"><a href="#删除分支" class="headerlink" title="删除分支"></a>删除分支</h2><p>合并完成之后，就可以放心删除分支了。</p>
+<p>使用命令<code>git branch -d 分支名</code> 如，删除dev分支，使用命令<code>git branch -d dev</code> 。在使用<code>git branch</code> 就会发现dev分支不见了。</p>
+<h1 id="解决冲突"><a href="#解决冲突" class="headerlink" title="解决冲突"></a>解决冲突</h1><p>我们在分支合并的时候可能会遇到冲突。</p>
+<p>创建一个feature1分支，<code>git switch -c feature1</code> ,在其中一个文件末尾如readme.txt添加一行<code>merge test feature1</code> 。</p>
+<p>使用<code>git add</code>和<code>git commit</code> 提交。</p>
+<p>然后，<code>git switch master</code> 返回主分支，同样在readme,txt的末尾添加一行<code>merge test master</code> ,同样使用<code>git add</code>和<code>git commit</code> 提交。此时的分支情况如图：</p>
+<img src="/2019/09/22/git/git使用学习-二/6.png">
+<p>在这种情况下，git无法执行快速合并 (分支比master超前提交，直接移动指针合并)，只能将各自的修改合并起来，不同地方的修改合并到一起，这种合并可能会发生冲突，同一处地方进行了不同的修改。</p>
+<p>冲突之后会给出提示，也可以使用<code>git status</code> 查看，手动修改解决冲突后可以再合并。</p>
+<p>使用命令<code>git log --graph</code> 可以查看分支合并流程图。</p>
+<p>使用命令<code>git log --graph --pretty=oneline --abbrev-commit</code>可以简要查看分支的合并与提交情况。</p>
+<h1 id="分支管理策略"><a href="#分支管理策略" class="headerlink" title="分支管理策略"></a>分支管理策略</h1><p>在实际的工作中，master作为主分支，上面的代码都是稳定的，是可发行的版本，很少进行提交，保留干净的提交记录。团队工作提交都在另一个分支dev上，为项目添加特性。</p>
+<p>通常合并分支时可能会使用<code>Fast forward</code> 模式，在这种模式下，删除分支后，就会丢失掉分支信息。一般我们推荐合并的时候加入参数<code>--no-ff</code> 禁用<code>Fast forward</code> 。这样git会在合并时生成一个新的提交对象，使用命令<code>git log --graph --pretty=oneline --abbrev-commit</code>从分支历史上就可以看出分支信息，而使用<code>Fast forward</code> 模式，是看不到分支存在的记录的，每一次提交都记录在合并到的分支上。</p>
+<p>如果顺着一个分支可以到达另一个分支时，git在合并时，只会简单的将指针移动。</p>
+<p>合并前：</p>
+<img src="/2019/09/22/git/git使用学习-二/7.png">
+<p>使用<code>Fast forward</code> 模式合并：</p>
+<img src="/2019/09/22/git/git使用学习-二/8.png">
+<p>添加<code>--no-ff</code> 参数合并：</p>
+<img src="/2019/09/22/git/git使用学习-二/9.png">
+<p>使用<code>--no-ff</code> 参数可以使master分支上的的提交历史变得干净，只保留每次发行版本时的提交记录，而我们在分支上进行的修改则保留在dev分支上。并且，当我们的master发生了问题，我们可以很方便得返回上一个可使用的版本。</p>
+<p>命令为：</p>
+<p><code>git merge --no-ff -m&quot;提交说明&quot; branch_name</code> ，由于需要进行一次新的提交，所以需要使用参数<code>-m</code> 添加提交说明。</p>
+<p>如将dev分支合并<code>git merge --no-ff -m&quot;dev branch commit&quot; dev</code>,即可 。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+    
+
+    
+      
+    
+    
+      <div>
+        <div id="reward-container">
+  <div>请他喝杯茶</div>
+  <button id="reward-button" disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+
+    
+      
+      
+        
+      
+      <div style="display: inline-block">
+        <img src="/images/wechatpay.png" alt="周燚乾 微信支付">
+        <p>微信支付</p>
+      </div>
+    
+      
+      
+        
+      
+      <div style="display: inline-block">
+        <img src="/images/alipay.png" alt="周燚乾 支付宝">
+        <p>支付宝</p>
+      </div>
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/实用工具/" <i class="fa fa-tag"> 实用工具</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/09/19/git/git使用学习-一/" rel="next" title="git使用学习（一）">
+                <i class="fa fa-chevron-left"></i> git使用学习（一）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/03/20/spring/docker/" rel="prev" title="Docker">
+                Docker <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="周燚乾">
+            
+              <p class="site-author-name" itemprop="name">周燚乾</p>
+              <div class="site-description motion-element" itemprop="description">编程之路</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives">
+                
+                    <span class="site-state-item-count">3</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">2</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                    <span class="site-state-item-count">1</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/zyq-yl" title="GitHub &rarr; https://github.com/zyq-yl" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#创建与合并分支"><span class="nav-number">1.</span> <span class="nav-text">创建与合并分支</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#创建分支"><span class="nav-number">1.1.</span> <span class="nav-text">创建分支</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#合并分支"><span class="nav-number">1.2.</span> <span class="nav-text">合并分支</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#删除分支"><span class="nav-number">1.3.</span> <span class="nav-text">删除分支</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#解决冲突"><span class="nav-number">2.</span> <span class="nav-text">解决冲突</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#分支管理策略"><span class="nav-number">3.</span> <span class="nav-text">分支管理策略</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">周燚乾</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.1.1</div>
+
+
+
+<!-- 新增访客统计代码 -->
+
+<div class="busuanzi-count">
+    <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="site-uv">
+      <i class="fa fa-user"></i>
+      访问用户： <span class="busuanzi-value" id="busuanzi_value_site_uv"></span> 人
+    </span>
+    <div class="powered-by"></div>
+    <span class="site-uv">
+      <i class="fa fa-eye"></i>
+      访问次数： <span class="busuanzi-value" id="busuanzi_value_site_pv"></span> 次
+    </span>
+    <!-- 博客字数统计 -->
+    <span class="site-pv">
+      <i class="fa fa-pencil"></i>
+      博客全站共： <span class="post-count"></span> 字
+    </span>
+</div>
+<!-- 新增访客统计代码 END-->
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+    
+    
+  
+  <script color="0,0,255" opacity="0.5" zindex="-1" count="99" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/utils.js?v=7.1.1"></script>
+
+  <script src="/js/motion.js?v=7.1.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/affix.js?v=7.1.1"></script>
+
+  <script src="/js/schemes/pisces.js?v=7.1.1"></script>
+
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.1.1"></script>
+<script src="/js/post-details.js?v=7.1.1"></script>
+
+
+
+  
+
+
+  <script src="/js/next-boot.js?v=7.1.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
